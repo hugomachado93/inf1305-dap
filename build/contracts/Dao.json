@@ -1,0 +1,296 @@
+{
+  "contractName": "Dao",
+  "abi": [
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "sayHello",
+      "outputs": [
+        {
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "pure",
+      "type": "function"
+    }
+  ],
+  "metadata": "{\"compiler\":{\"version\":\"0.5.8+commit.23d335f2\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"constant\":true,\"inputs\":[],\"name\":\"sayHello\",\"outputs\":[{\"name\":\"\",\"type\":\"string\"}],\"payable\":false,\"stateMutability\":\"pure\",\"type\":\"function\"}],\"devdoc\":{\"methods\":{}},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/home/vabows/Documents/DAO/contracts/Dao.sol\":\"Dao\"},\"evmVersion\":\"petersburg\",\"libraries\":{},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"/home/vabows/Documents/DAO/contracts/Dao.sol\":{\"keccak256\":\"0x27db5f5f9263a6be60163cb08225347b1a657c10f4b900ad823c1a09d43eb29e\",\"urls\":[\"bzzr://da50d3204375067bf90973694956cacbc982710825155bfae4f11d8886ab4f99\"]}},\"version\":1}",
+  "bytecode": "0x608060405234801561001057600080fd5b50610114806100206000396000f3fe6080604052348015600f57600080fd5b506004361060285760003560e01c8063ef5fb05b14602d575b600080fd5b603360ab565b6040518080602001828103825283818151815260200191508051906020019080838360005b8381101560715780820151818401526020810190506058565b50505050905090810190601f168015609d5780820380516001836020036101000a031916815260200191505b509250505060405180910390f35b60606040518060400160405280600b81526020017f68656c6c6f20776f726c6400000000000000000000000000000000000000000081525090509056fea165627a7a723058204cd45769832c553e5c21991e9feb8f90ee20d665ea8c6900f1559fc861ef9ee00029",
+  "deployedBytecode": "0x6080604052348015600f57600080fd5b506004361060285760003560e01c8063ef5fb05b14602d575b600080fd5b603360ab565b6040518080602001828103825283818151815260200191508051906020019080838360005b8381101560715780820151818401526020810190506058565b50505050905090810190601f168015609d5780820380516001836020036101000a031916815260200191505b509250505060405180910390f35b60606040518060400160405280600b81526020017f68656c6c6f20776f726c6400000000000000000000000000000000000000000081525090509056fea165627a7a723058204cd45769832c553e5c21991e9feb8f90ee20d665ea8c6900f1559fc861ef9ee00029",
+  "sourceMap": "24:113:0:-;;;;8:9:-1;5:2;;;30:1;27;20:12;5:2;24:113:0;;;;;;;",
+  "deployedSourceMap": "24:113:0:-;;;;8:9:-1;5:2;;;30:1;27;20:12;5:2;24:113:0;;;;;;;;;;;;;;;;;;;43:92;;;:::i;:::-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;23:1:-1;8:100;33:3;30:1;27:10;8:100;;;99:1;94:3;90:11;84:18;80:1;75:3;71:11;64:39;52:2;49:1;45:10;40:15;;8:100;;;12:14;43:92:0;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;83:13;108:20;;;;;;;;;;;;;;;;;;;43:92;:::o",
+  "source": "pragma solidity ^0.5.8;\ncontract Dao {\n    function sayHello() public pure returns(string memory) {\n        return \"hello world\";\n    }\n}",
+  "sourcePath": "/home/vabows/Documents/DAO/contracts/Dao.sol",
+  "ast": {
+    "absolutePath": "/home/vabows/Documents/DAO/contracts/Dao.sol",
+    "exportedSymbols": {
+      "Dao": [
+        10
+      ]
+    },
+    "id": 11,
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 1,
+        "literals": [
+          "solidity",
+          "^",
+          "0.5",
+          ".8"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "0:23:0"
+      },
+      {
+        "baseContracts": [],
+        "contractDependencies": [],
+        "contractKind": "contract",
+        "documentation": null,
+        "fullyImplemented": true,
+        "id": 10,
+        "linearizedBaseContracts": [
+          10
+        ],
+        "name": "Dao",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "body": {
+              "id": 8,
+              "nodeType": "Block",
+              "src": "98:37:0",
+              "statements": [
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "hexValue": "68656c6c6f20776f726c64",
+                    "id": 6,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": true,
+                    "kind": "string",
+                    "lValueRequested": false,
+                    "nodeType": "Literal",
+                    "src": "115:13:0",
+                    "subdenomination": null,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_stringliteral_47173285a8d7341e5e972fc677286384f802f8ef42a5ec5f03bbfa254cb01fad",
+                      "typeString": "literal_string \"hello world\""
+                    },
+                    "value": "hello world"
+                  },
+                  "functionReturnParameters": 5,
+                  "id": 7,
+                  "nodeType": "Return",
+                  "src": "108:20:0"
+                }
+              ]
+            },
+            "documentation": null,
+            "id": 9,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "sayHello",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 2,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "60:2:0"
+            },
+            "returnParameters": {
+              "id": 5,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 4,
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 9,
+                  "src": "83:13:0",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_memory_ptr",
+                    "typeString": "string"
+                  },
+                  "typeName": {
+                    "id": 3,
+                    "name": "string",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "83:6:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_string_storage_ptr",
+                      "typeString": "string"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "82:15:0"
+            },
+            "scope": 10,
+            "src": "43:92:0",
+            "stateMutability": "pure",
+            "superFunction": null,
+            "visibility": "public"
+          }
+        ],
+        "scope": 11,
+        "src": "24:113:0"
+      }
+    ],
+    "src": "0:137:0"
+  },
+  "legacyAST": {
+    "absolutePath": "/home/vabows/Documents/DAO/contracts/Dao.sol",
+    "exportedSymbols": {
+      "Dao": [
+        10
+      ]
+    },
+    "id": 11,
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 1,
+        "literals": [
+          "solidity",
+          "^",
+          "0.5",
+          ".8"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "0:23:0"
+      },
+      {
+        "baseContracts": [],
+        "contractDependencies": [],
+        "contractKind": "contract",
+        "documentation": null,
+        "fullyImplemented": true,
+        "id": 10,
+        "linearizedBaseContracts": [
+          10
+        ],
+        "name": "Dao",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "body": {
+              "id": 8,
+              "nodeType": "Block",
+              "src": "98:37:0",
+              "statements": [
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "hexValue": "68656c6c6f20776f726c64",
+                    "id": 6,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": true,
+                    "kind": "string",
+                    "lValueRequested": false,
+                    "nodeType": "Literal",
+                    "src": "115:13:0",
+                    "subdenomination": null,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_stringliteral_47173285a8d7341e5e972fc677286384f802f8ef42a5ec5f03bbfa254cb01fad",
+                      "typeString": "literal_string \"hello world\""
+                    },
+                    "value": "hello world"
+                  },
+                  "functionReturnParameters": 5,
+                  "id": 7,
+                  "nodeType": "Return",
+                  "src": "108:20:0"
+                }
+              ]
+            },
+            "documentation": null,
+            "id": 9,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "sayHello",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 2,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "60:2:0"
+            },
+            "returnParameters": {
+              "id": 5,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 4,
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 9,
+                  "src": "83:13:0",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_memory_ptr",
+                    "typeString": "string"
+                  },
+                  "typeName": {
+                    "id": 3,
+                    "name": "string",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "83:6:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_string_storage_ptr",
+                      "typeString": "string"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "82:15:0"
+            },
+            "scope": 10,
+            "src": "43:92:0",
+            "stateMutability": "pure",
+            "superFunction": null,
+            "visibility": "public"
+          }
+        ],
+        "scope": 11,
+        "src": "24:113:0"
+      }
+    ],
+    "src": "0:137:0"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.5.8+commit.23d335f2.Emscripten.clang"
+  },
+  "networks": {
+    "5777": {
+      "events": {},
+      "links": {},
+      "address": "0xF384Cef71Aa04ab7f86129A1204Dc61dFa6487a2",
+      "transactionHash": "0xc2024e9839f2298cd4f5da634a00f8c8f080e4b6b5f8c525f0d864548b370fa3"
+    }
+  },
+  "schemaVersion": "3.0.16",
+  "updatedAt": "2019-11-23T15:57:09.655Z",
+  "devdoc": {
+    "methods": {}
+  },
+  "userdoc": {
+    "methods": {}
+  }
+}
