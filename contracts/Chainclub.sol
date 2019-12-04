@@ -18,9 +18,16 @@ pragma experimental ABIEncoderV2;
 }*/
 
 contract Chainclub {
-    
-    //address deployedDateTimeContractAddress = 0x58d94A58A3D1e0eA5E54C24258c4E1dD55dA0FE8; // The DateTime class/contract address
-    //DateTimeAPI dateTime = DateTimeAPI(deployedDateTimeContractAddress); // Creates an interface to the DateTime class
+    constructor(uint8 administratorsCount, Member[] memory admins) public {
+        adminsCount = administratorsCount;
+
+        for (uint i = 0; i < adminsCount; i++) {
+            members.push(admins[i]);
+        }
+        
+        startPoll(0, 0, "Decide the maximum number of members of our chainclub.", adminsCount, 1);
+        startPoll(1, 0, "Decide the membership price.", adminsCount, 1);
+    }
 
     struct Member {
         uint index;
@@ -48,7 +55,7 @@ contract Chainclub {
     // Enums
     uint8 constant CREATED_BY_ADMIN = 0;
     uint8 constant CREATED_BY_MEMBER = 1;
-
+    
     // Checks if the poll is not ended by votes count
     modifier isNotEndedByVotes(uint pollIndex) { 
         require(pollVotes[pollIndex].length < polls[pollIndex].endInVotesCount); 
@@ -71,23 +78,10 @@ contract Chainclub {
     Member[] members; // guarda todos membros (incluindo admins)
     Poll[] polls; // guarda todas polls criadas
     mapping (uint => Vote[]) pollVotes; // guarda os votos de uma poll
-
-    /// Create a new chainclub contract with $(administratorsCount) admins and starts polls between the admins to decide important things.
-    //"2",[["0","15226939710","Gustavo","Contreiras","0x6247d71202ed3e1547acbd8979ad375a88a5c632","1"],["1","15226939711","Felipe","Gonçalves","0x5632d71202ed3e1547acdb8979ad375a88a5c731","1"]]
-    constructor(uint8 administratorsCount, Member[] memory admins) public {
-        adminsCount = administratorsCount;
-
-        for (uint i = 0; i < adminsCount; i++) {
-            members.push(admins[i]);
-        }
-        
-        startPoll(0, 0, "Decide the maximum number of members of our chainclub.", adminsCount, 1);
-        startPoll(1, 0, "Decide the membership price.", adminsCount, 1);
-    }
     
-    function startPoll (
-    uint index, uint starterIndex, string memory pollSubject, uint durationInVotes, uint8 accessNeededToVote) 
-    public isNotEmpty(pollSubject) {
+    function startPoll (uint index, uint starterIndex, string memory pollSubject, uint durationInVotes, 
+    uint8 accessNeededToVote) public isNotEmpty(pollSubject) 
+    {
         polls.push(Poll(index, starterIndex, pollSubject, accessNeededToVote, durationInVotes));
     }
     
@@ -111,13 +105,10 @@ contract Chainclub {
     function getPoll (uint pollIndex) public view returns (Poll memory) {
         return polls[pollIndex];
     }
-    
-    // Não funciona e deve ser feito no browser
-    /*function getPollVote (uint pollIndex, uint voteIndex) public view returns (Vote memory) {
-        Vote[] storage votes = pollVotes[pollIndex];
-        Vote storage vote = votes[voteIndex];
-        return vote;
-    }*/
+    function getPollSubject(uint index)
+        public view returns (string memory) {
+        return polls[index].subject;
+    }
     
     function getPollVotes (uint pollIndex) public view returns (Vote[] memory) {
         return pollVotes[pollIndex];
@@ -138,27 +129,6 @@ contract Chainclub {
             }
         }
     }
-    
-    // Não funciona e deve ser feito no browser
-    /*function getMemberVote (address memberAddress, uint pollIndex) public view returns (Vote memory) {
-        for (uint i = 0; i < pollVotes[pollIndex].length; i++) {
-            if (pollVotes[pollIndex][i].ownerAddress == memberAddress) {
-                return pollVotes[pollIndex][i];
-            }
-        }
-        return Vote(msg.sender,"",0);
-    }*/
-    
-    // Não funciona e deve ser feito no browser
-    /*function getMemberVote (uint memberIndex, uint pollIndex) public view returns (Vote memory) {
-        address memberAddress = getMember(memberIndex).wallet;
-        for (uint i = 0; i < pollVotes[pollIndex].length; i++) {
-            if (pollVotes[pollIndex][i].ownerAddress == memberAddress) {
-                return pollVotes[pollIndex][i];
-            }
-        }
-        return Vote(msg.sender,"",0);
-    }*/
     
     function getMembers () public view returns (Member[] memory) {
         return members;
@@ -191,5 +161,9 @@ contract Chainclub {
             }
         }
         return false;
+    }
+    function getPollCount()
+        public view returns (uint) {
+        return polls.length;
     }
 }
