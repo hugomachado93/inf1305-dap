@@ -57,9 +57,13 @@ contract Chainclub {
         require(!stringsAreEqual(pollSubject, "")); _; 
     }
     
+    modifier moneyIsEnough(uint value) { 
+        require(value >= MEMBERSHIP_PRICE); _; 
+    }
+    
     // Enums
-    uint16 constant MAX_MEMBERS = 1000;
-    uint16 constant PRICE = 10;
+    uint16 constant MAX_MEMBERS = 1;
+    uint constant MEMBERSHIP_PRICE = 1000000000;
     
     address payable contractOwner;
     
@@ -128,11 +132,11 @@ contract Chainclub {
         );
     }
     
-    function buyMembership(string memory buyerName) payable public {
+    function buyMembership(string memory buyerName) payable public moneyIsEnough(msg.value) {
         
         // Dinheiro vai pro fundador
         if (members.length < MAX_MEMBERS) {
-            contractOwner.transfer(PRICE);
+            contractOwner.transfer(msg.value);
         }
         
         // Procura membro que esteja vendendo
@@ -144,13 +148,12 @@ contract Chainclub {
                     );
                     
                     // Dinheiro vai pro membro
-                    members[i].wallet.transfer(PRICE);
+                    members[i].wallet.transfer(msg.value);
                 }
             }
         }
     }
     
-    /// Leaving the chainclub
     function sellMembership () public {
         for (uint i = 0; i < members.length; i++) {
             if (members[i].wallet == msg.sender) {
@@ -166,48 +169,24 @@ contract Chainclub {
         return booleanPolls[pollIndex];
     }
     
-    function getBooleanPollSubject (uint pollIndex) public view returns (string memory) {
-        return booleanPolls[pollIndex].subject;
-    }
-    
     function getQuantityPoll (uint pollIndex) public view returns (QuantityPoll memory) {
         return quantityPolls[pollIndex];
-    }
-    
-    function getQuantityPollSubject (uint pollIndex) public view returns (string memory) {
-        return quantityPolls[pollIndex].subject;
     }
     
     function getOptionsPoll (uint pollIndex) public view returns (OptionsPoll memory) {
         return optionsPolls[pollIndex];
     }
     
-    function getOptionsPollSubject (uint pollIndex) public view returns (string memory) {
-        return optionsPolls[pollIndex].subject;
-    }
-    
     function getBooleanPollVotes (uint pollIndex) public view returns (BooleanVote[] memory) {
         return booleanPollsVotes[pollIndex];
-    }
-    
-    function getBooleanPollVotesCount (uint pollIndex) public view returns (uint) {
-        return booleanPollsVotes[pollIndex].length;
     }
     
     function getQuantityPollVotes (uint pollIndex) public view returns (QuantityVote[] memory) {
         return quantityPollsVotes[pollIndex];
     }
     
-    function getQuantityPollVotesCount (uint pollIndex) public view returns (uint) {
-        return quantityPollsVotes[pollIndex].length;
-    }
-    
     function getOptionsPollVotes (uint pollIndex) public view returns (OptionVote[] memory) {
         return optionsPollsVotes[pollIndex];
-    }
-    
-    function getOptionsPollVotesCount (uint pollIndex) public view returns (uint) {
-        return optionsPollsVotes[pollIndex].length;
     }
     
     function getMember (uint memberIndex) public view returns (Member memory) {
@@ -224,6 +203,36 @@ contract Chainclub {
     
     function getMembers () public view returns (Member[] memory) {
         return members;
+    }
+    
+    function getMembershipPrice() public pure returns (uint) {
+        return MEMBERSHIP_PRICE;
+    }
+    
+    /////////// FUNCOES QUE BUGAM NO REMIX IDE ////////
+    
+    function getBooleanPollSubject (uint pollIndex) public view returns (string memory) {
+        return booleanPolls[pollIndex].subject;
+    }
+    
+    function getQuantityPollSubject (uint pollIndex) public view returns (string memory) {
+        return quantityPolls[pollIndex].subject;
+    }
+    
+    function getOptionsPollSubject (uint pollIndex) public view returns (string memory) {
+        return optionsPolls[pollIndex].subject;
+    }
+    
+    function getBooleanPollVotesCount (uint pollIndex) public view returns (uint) {
+        return booleanPollsVotes[pollIndex].length;
+    }
+    
+    function getQuantityPollVotesCount (uint pollIndex) public view returns (uint) {
+        return quantityPollsVotes[pollIndex].length;
+    }
+    
+    function getOptionsPollVotesCount (uint pollIndex) public view returns (uint) {
+        return optionsPollsVotes[pollIndex].length;
     }
     
     //////////////// PRIVATE FUNCTIONS ////////////////
