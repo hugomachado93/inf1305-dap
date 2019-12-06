@@ -188,6 +188,14 @@ contract Chainclub {
     }
     
     //////////////// SIMPLE GETTERS ////////////////
+
+    function getQuantityPollBottomLimit (uint pollIndex) public view returns (uint) {
+        return quantityPolls[pollIndex].bottomLimit;
+    }
+
+    function getQuantityPollTopLimit (uint pollIndex) public view returns (uint) {
+        return quantityPolls[pollIndex].topLimit;
+    }
     
     function getBooleanPoll (uint pollIndex) public view returns (BooleanPoll memory) {
         return booleanPolls[pollIndex];

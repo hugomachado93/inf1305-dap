@@ -162,7 +162,10 @@ App = {
           }
 
           else if(App.polls[i].type == 'quantity') {
-            $("#polls-list").append(`<li>${App.polls[i].subject} (${App.polls[i].num_votes} votes) <input></input></li>`)
+            $("#polls-list").append(`<li>${App.polls[i].subject} (${App.polls[i].num_votes} votes)                  <p class="range-field">
+            <input type="range" name="myVal" id="myVal" min="${}" max="1000" value="0" oninput="this.form.myValInput.value=this.value" />
+            <input type="number" name="myValInput" min="0" max="1000" value="0" oninput="this.form.myVal.value=this.value" />
+          </p></li>`)
           }
         }
       });
@@ -180,9 +183,11 @@ App = {
 
   quantitypoll: function() {
     var booleanpoll = $("#quantity-poll").val();
+    var superiorlimit = $("#superior-limit").val();
+    var inferiorlimtit = $("#inferior-limit").val();
 
     App.contracts.Chainclub.deployed().then(function(instance){
-      instance.startQuantityPoll(booleanpoll, {from: App.account}).then(function(result){
+      instance.startQuantityPoll(booleanpoll,inferiorlimtit,superiorlimit, {from: App.account}).then(function(result){
         console.log(result);
       });
     });
