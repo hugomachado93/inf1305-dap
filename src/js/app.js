@@ -50,17 +50,6 @@ App = {
         return instance;
       })
       .then(async function(chainclubInstance) {        
-        // boolPollCount = await chainclubInstance.getBooleanPollsCount().then(res => {
-        //   return res.c[0]
-        // })
-
-        // optionPollCount = await chainclubInstance.getOptionsPollsCount().then(res => {
-        //   return res.c[0]
-        // })
-
-        // quantityPollCount = await chainclubInstance.getQuantityPollsCount().then(res => {
-        //   return res.c[0]
-        // })
 
         var count = 0
         var end = false
@@ -168,7 +157,28 @@ App = {
         }
         console.log(App.polls)
       });
+  },
+
+  booleanpoll: function() {
+    var booleanpoll = $("#boolen-poll").val();
+
+    App.contracts.Chainclub.deployed().then(function(instance){
+      instance.startBooleanPoll(booleanpoll, {from: App.account}).then(function(result){
+        console.log(result);
+      });
+    });
+  },
+
+  quantitypoll: function() {
+    var booleanpoll = $("#quantity-poll").val();
+
+    App.contracts.Chainclub.deployed().then(function(instance){
+      instance.startQuantityPoll(booleanpoll, {from: App.account}).then(function(result){
+        console.log(result);
+      });
+    });
   }
+
 };
 
 window.setMessage = function() {
@@ -184,6 +194,7 @@ window.setMessage = function() {
       console.log(err);
     });
 };
+
 $(function() {
   $(window).load(function() {
     App.init();
