@@ -101,21 +101,29 @@ App = {
             break
           }
 
-          console.log(subject)
-
           const num_votes = await chainclubInstance.getQuantityPollVotesCount(count)
           .then(res => {
             return res.c[0]
           });
 
-          console.log(num_votes)
+          const bottom_limit = await chainclubInstance.getQuantityPollBottomLimit(count)
+          .then(res => {
+            return res.c[0]
+          });
+
+          const top_limit = await chainclubInstance.getQuantityPollTopLimit(count)
+          .then(res => {
+            return res.c[0]
+          });
 
           count++;
 
           poll = {
             subject: subject,
             num_votes: num_votes,
-            type: 'quantity'
+            type: 'quantity',
+            bottom_limit: bottom_limit,
+            top_limit: top_limit
           }
 
           App.polls.push(poll)
@@ -136,14 +144,10 @@ App = {
             break
           }
 
-          console.log(subject)
-
           const num_votes = await chainclubInstance.getOptionsPollVotesCount(count)
           .then(res => {
             return res.c[0]
           });
-
-          console.log(num_votes)
 
           count++;
 
@@ -156,16 +160,24 @@ App = {
           App.polls.push(poll)
         }
 
+        console.log(App.polls)
+
         for(var i = 0; i < App.polls.length; i++) {
           if(App.polls[i].type == 'boolean') {
             $("#polls-list").append(`<li>${App.polls[i].subject} (${App.polls[i].num_votes} votes) <button>Yes</button> <button>No</button></li>`)
           }
 
           else if(App.polls[i].type == 'quantity') {
-            $("#polls-list").append(`<li>${App.polls[i].subject} (${App.polls[i].num_votes} votes)                  <p class="range-field">
-            <input type="range" name="myVal" id="myVal" min="${}" max="1000" value="0" oninput="this.form.myValInput.value=this.value" />
-            <input type="number" name="myValInput" min="0" max="1000" value="0" oninput="this.form.myVal.value=this.value" />
-          </p></li>`)
+            $("#polls-list").append(`
+            <li>${App.polls[i].subject} (${App.polls[i].num_votes} votes)
+              <form action="#">
+                <p class="range-field">
+                  <input type="range" name="myVal" id="myVal" min="${App.polls[i].bottom_limit}" max="${App.polls[i].top_limit}" value="0" oninput="this.form.myValInput.value=this.value" />
+                  <input type="number" name="myValInput" min="${App.polls[i].bottom_limit}" max="${App.polls[i].top_limit}" value="0" oninput="this.form.myVal.value=this.value" />
+                  <button>Confirm</button>
+                </p>
+              </form>
+            </li>`)
           }
         }
       });
