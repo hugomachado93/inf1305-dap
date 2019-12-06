@@ -24,6 +24,8 @@ contract Chainclub {
     struct QuantityPoll {
         uint pollIndex;
         string subject;     // Ex: Quantos reais gastaremos no nosso novo investimento?
+        uint bottomLimit;
+        uint topLimit;
     }
     
     struct BooleanVote {
@@ -58,12 +60,12 @@ contract Chainclub {
     }
     
     modifier moneyIsEnough(uint value) { 
-        require(value >= MEMBERSHIP_PRICE); _; 
+        require(value >= MEMBERSHIP_PRICE_IN_WEI); _; 
     }
     
     // Enums
     uint16 constant MAX_MEMBERS = 1;
-    uint constant MEMBERSHIP_PRICE = 1000000000;
+    uint constant MEMBERSHIP_PRICE_IN_WEI = 1000000000;
     
     address payable contractOwner;
     
@@ -92,10 +94,10 @@ contract Chainclub {
         );
     }
     
-    function startQuantityPoll (string memory pollSubject) public isNotEmpty(pollSubject) {
+    function startQuantityPoll (string memory pollSubject, uint bottomLimit, uint topLimit) public isNotEmpty(pollSubject) {
         quantityPolls.push(
             QuantityPoll(
-                quantityPolls.length, pollSubject
+                quantityPolls.length, pollSubject, bottomLimit, topLimit
             )
         );
     }
@@ -142,12 +144,13 @@ contract Chainclub {
         // Procura membro que esteja vendendo
         else { 
             for (uint i = 0; i < members.length; i++) {
-                if (members[i].isSellingMembership) {
+                
+                if (members[i].isSellingMembership && members[i].wallet != msg.sender) {
                     members[i] = Member(
                         msg.sender, buyerName, true, false
                     );
                     
-                    // Dinheiro vai pro membro
+                    // Dinheiro vai pro membro que ta vendendo
                     members[i].wallet.transfer(msg.value);
                 }
             }
@@ -206,10 +209,10 @@ contract Chainclub {
     }
     
     function getMembershipPrice() public pure returns (uint) {
-        return MEMBERSHIP_PRICE;
+        return MEMBERSHIP_PRICE_IN_WEI;
     }
     
-    /////////// FUNCOES QUE BUGAM NO REMIX IDE ////////
+    ///// FUNCOES QUE BUGAM NO REMIX IDE SEM ENABLE OPTIMIZATION //////
     
     function getBooleanPollSubject (uint pollIndex) public view returns (string memory) {
         return booleanPolls[pollIndex].subject;
