@@ -44,15 +44,15 @@ contract Chainclub {
     }
     
     modifier didNotVoteOnBooleanPoll(address memberAddress, uint pollIndex) {
-        require(!alreadyVotedOnBooleanPoll(memberAddress, pollIndex));_;
+        require(!alreadyVotedOnBooleanPoll(memberAddress, pollIndex)); _;
     }
     
     modifier didNotVoteOnQuantityPoll(address memberAddress, uint pollIndex) {
-        require(!alreadyVotedOnQuantityPoll(memberAddress, pollIndex));_;
+        require(!alreadyVotedOnQuantityPoll(memberAddress, pollIndex)); _;
     }
     
     modifier didNotVoteOnOptionsPoll(address memberAddress, uint pollIndex) {
-        require(!alreadyVotedOnOptionsPoll(memberAddress, pollIndex));_;
+        require(!alreadyVotedOnOptionsPoll(memberAddress, pollIndex)); _;
     }
     
     modifier isNotEmpty(string memory pollSubject) { 
@@ -63,8 +63,22 @@ contract Chainclub {
         require(value >= MEMBERSHIP_PRICE_IN_WEI); _; 
     }
     
+    modifier isMember(address addr) {
+        bool boolean = false; 
+        for (uint i = 0; i < members.length; i++) {
+            if (members[i].wallet == msg.sender) {
+                boolean = true;
+            }
+        }
+        require(boolean); _;
+    }
+    
+    modifier isOnLimit(uint pollIndex, uint quantity) {
+        require (quantityPolls[pollIndex].bottomLimit <= quantity && quantityPolls[pollIndex].topLimit >= quantity); _;
+    }
+    
     // Enums
-    uint16 constant MAX_MEMBERS = 1;
+    uint16 constant MAX_MEMBERS = 1000;
     uint constant MEMBERSHIP_PRICE_IN_WEI = 1000000000;
     
     address payable contractOwner;
@@ -86,7 +100,8 @@ contract Chainclub {
         );
     }
     
-    function startBooleanPoll (string memory pollSubject) public isNotEmpty(pollSubject) {
+    function startBooleanPoll (string memory pollSubject) 
+    public isNotEmpty(pollSubject) {
         booleanPolls.push(
             BooleanPoll(
                 booleanPolls.length, pollSubject
@@ -94,7 +109,8 @@ contract Chainclub {
         );
     }
     
-    function startQuantityPoll (string memory pollSubject, uint bottomLimit, uint topLimit) public isNotEmpty(pollSubject) {
+    function startQuantityPoll (string memory pollSubject, uint bottomLimit, uint topLimit) 
+    public isNotEmpty(pollSubject) {
         quantityPolls.push(
             QuantityPoll(
                 quantityPolls.length, pollSubject, bottomLimit, topLimit
@@ -102,7 +118,8 @@ contract Chainclub {
         );
     }
     
-    function startOptionsPoll (string memory pollSubject, string[] memory options) public isNotEmpty(pollSubject) {
+    function startOptionsPoll (string memory pollSubject, string[] memory options) 
+    public isNotEmpty(pollSubject) {
         optionsPolls.push(
             OptionsPoll(
                 optionsPolls.length, pollSubject, options
@@ -110,7 +127,8 @@ contract Chainclub {
         );
     }
     
-    function voteOnBooleanPool(uint pollIndex, bool boolean) public didNotVoteOnBooleanPoll(msg.sender, pollIndex) {
+    function voteOnBooleanPool(uint pollIndex, bool boolean) 
+    public isMember(msg.sender) didNotVoteOnBooleanPoll(msg.sender, pollIndex) {
         booleanPollsVotes[pollIndex].push(
             BooleanVote(
                 msg.sender, boolean
@@ -118,7 +136,8 @@ contract Chainclub {
         );
     }
     
-    function voteOnQuantityPool(uint pollIndex, uint quantity) public didNotVoteOnQuantityPoll(msg.sender, pollIndex) {
+    function voteOnQuantityPool(uint pollIndex, uint quantity) 
+    public isMember(msg.sender) isOnLimit(pollIndex, quantity) didNotVoteOnQuantityPoll(msg.sender, pollIndex) {
         quantityPollsVotes[pollIndex].push(
             QuantityVote(
                 msg.sender, quantity
@@ -126,7 +145,8 @@ contract Chainclub {
         );
     }
     
-    function voteOnOptionPool(uint pollIndex, uint option) public didNotVoteOnOptionsPoll(msg.sender, pollIndex) {
+    function voteOnOptionPool(uint pollIndex, uint option) 
+    public isMember(msg.sender) didNotVoteOnOptionsPoll(msg.sender, pollIndex) {
         optionsPollsVotes[pollIndex].push(
             OptionVote(
                 msg.sender, option
@@ -134,7 +154,8 @@ contract Chainclub {
         );
     }
     
-    function buyMembership(string memory buyerName) payable public moneyIsEnough(msg.value) {
+    function buyMembership(string memory buyerName) payable 
+    public moneyIsEnough(msg.value) {
         
         // Dinheiro vai pro fundador
         if (members.length < MAX_MEMBERS) {
