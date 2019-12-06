@@ -155,7 +155,16 @@ App = {
 
           App.polls.push(poll)
         }
-        console.log(App.polls)
+
+        for(var i = 0; i < App.polls.length; i++) {
+          if(App.polls[i].type == 'boolean') {
+            $("#polls-list").append(`<li>${App.polls[i].subject} (${App.polls[i].num_votes} votes) <button>Yes</button> <button>No</button></li>`)
+          }
+
+          else if(App.polls[i].type == 'quantity') {
+            $("#polls-list").append(`<li>${App.polls[i].subject} (${App.polls[i].num_votes} votes) <input></input></li>`)
+          }
+        }
       });
   },
 
