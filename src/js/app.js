@@ -46,33 +46,128 @@ App = {
     //Projeto Inicia aqui
     App.contracts.Chainclub.deployed()
       .then(function(instance) {
+        console.log(instance)
         return instance;
       })
-      .then(function(chainclubInstance) {        
-        chainclubInstance.getPollCount().then(res => {
-          return res.c[0]
-        })
-        .then(async count => {
-          for(var i = 0; i < count; i++) {
-            const subject = await chainclubInstance.getPollSubject(i).then(res => {
-              return res
-            })
+      .then(async function(chainclubInstance) {        
+        // boolPollCount = await chainclubInstance.getBooleanPollsCount().then(res => {
+        //   return res.c[0]
+        // })
 
-            const votes = await chainclubInstance.getNumberOfVotes(i).then(res => {
-              return res.c[0]
-            })
+        // optionPollCount = await chainclubInstance.getOptionsPollsCount().then(res => {
+        //   return res.c[0]
+        // })
 
-            poll = {
-              subject: subject,
-              votes: votes
-            }
+        // quantityPollCount = await chainclubInstance.getQuantityPollsCount().then(res => {
+        //   return res.c[0]
+        // })
 
-            App.polls.push(subject)
+        var count = 0
+        var end = false
+        while(1) {
+          const subject = await chainclubInstance.getBooleanPollSubject(count)
+          .then(res => {
+            return res
+          })
+          .catch(err => {
+            end = true
+          });
+
+          if(end) {
+            break
           }
-        });
-      });
 
-    console.log(App.polls)
+          console.log(subject)
+
+          const num_votes = await chainclubInstance.getBooleanPollVotesCount(count)
+          .then(res => {
+            return res.c[0]
+          });
+
+          console.log(num_votes)
+
+          count++;
+
+          poll = {
+            subject: subject,
+            num_votes: num_votes,
+            type: 'boolean'
+          }
+
+          App.polls.push(poll)
+        }
+
+        count = 0
+        end = false
+        while(1) {
+          const subject = await chainclubInstance.getQuantityPollSubject(count)
+          .then(res => {
+            return res
+          })
+          .catch(err => {
+            end = true
+          });
+
+          if(end) {
+            break
+          }
+
+          console.log(subject)
+
+          const num_votes = await chainclubInstance.getQuantityPollVotesCount(count)
+          .then(res => {
+            return res.c[0]
+          });
+
+          console.log(num_votes)
+
+          count++;
+
+          poll = {
+            subject: subject,
+            num_votes: num_votes,
+            type: 'quantity'
+          }
+
+          App.polls.push(poll)
+        }
+
+        count = 0
+        end = false
+        while(1) {
+          const subject = await chainclubInstance.getOptionsPollSubject(count)
+          .then(res => {
+            return res
+          })
+          .catch(err => {
+            end = true
+          });
+
+          if(end) {
+            break
+          }
+
+          console.log(subject)
+
+          const num_votes = await chainclubInstance.getOptionsPollVotesCount(count)
+          .then(res => {
+            return res.c[0]
+          });
+
+          console.log(num_votes)
+
+          count++;
+
+          poll = {
+            subject: subject,
+            num_votes: num_votes,
+            type: 'options'
+          }
+
+          App.polls.push(poll)
+        }
+        console.log(App.polls)
+      });
   }
 };
 
@@ -80,7 +175,7 @@ window.setMessage = function() {
   let message = $("#new_message").val();
   App.contracts.Chainclub.deployed()
     .then(function(instance) {
-      return instance.startPoll(1, 1, message, 1, 1, { from: App.account });
+      return instance.startQuantityPoll( message );
     })
     .then(function(result) {
       console.log("done");

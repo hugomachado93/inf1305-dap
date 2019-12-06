@@ -1,126 +1,213 @@
 pragma solidity >=0.4.22 <0.6.0;
 pragma experimental ABIEncoderV2;
 
-/*contract DateTimeAPI {
-    function isLeapYear(uint16 year) public view returns (bool);
-    function getYear(uint timestamp) public view returns (uint16);
-    function getMonth(uint timestamp) public view returns (uint8);
-    function getDay(uint timestamp) public view returns (uint8);
-    function getHour(uint timestamp) public view returns (uint8);
-    function getMinute(uint timestamp) public view returns (uint8);
-    function getSecond(uint timestamp) public view returns (uint8);
-    function getWeekday(uint timestamp) public view returns (uint8);
-    function toTimestamp(uint16 year, uint8 month, uint8 day) public view returns (uint timestamp);
-    function toTimestamp(uint16 year, uint8 month, uint8 day, uint8 hour) public view returns (uint timestamp);
-    function toTimestamp(uint16 year, uint8 month, uint8 day, uint8 hour, uint8 minute) public view returns (uint timestamp);
-    function toTimestamp(uint16 year, uint8 month, uint8 day, uint8 hour, uint8 minute, uint8 second) public view returns (uint timestamp);
-    function currentTimeIsBeforeEndTime(uint currentTime, uint endTime) public pure returns (bool);
-}*/
-
 contract Chainclub {
-    constructor(uint8 administratorsCount, Member[] memory admins) public {
-        adminsCount = administratorsCount;
-
-        for (uint i = 0; i < adminsCount; i++) {
-            members.push(admins[i]);
-        }
-        
-        startPoll(0, 0, "Decide the maximum number of members of our chainclub.", adminsCount, 1);
-        startPoll(1, 0, "Decide the membership price.", adminsCount, 1);
-    }
-
+    
     struct Member {
-        uint index;
-        string cpf;
-        string firstName;
-        string lastName;
-        address wallet;
-        uint8 access; // 0 == membro, 1 == admin
+        address payable wallet;
+        string name;
+        bool paidLastMonth;
+        bool isSellingMembership;
     }
     
-    struct Poll {
-        uint index;
-        uint starterIndex; // 0 se a votação foi criada pela administração
-        string subject;
-        uint8 accessNeededToVote;
-        uint endInVotesCount;
+    struct BooleanPoll {    
+        uint pollIndex;
+        string subject;     // Ex: Vamos investir em algo para o clube?
     }
     
-    struct Vote {
-        address ownerAddress;
-        string stringParameter;
-        uint numberParameter;
+    struct OptionsPoll {    
+        uint pollIndex; 
+        string subject;     // Ex: No que vamos investir?
+        string[] options;   // "Piscina de ondas", "Pista de corrida", "Torre de bung jump"
+    }
+    
+    struct QuantityPoll {
+        uint pollIndex;
+        string subject;     // Ex: Quantos reais gastaremos no nosso novo investimento?
+    }
+    
+    struct BooleanVote {
+        address owner;
+        bool yesOrNo;
+    }
+    
+    struct OptionVote {
+        address owner;
+        uint optionIndex;
+    }
+
+    struct QuantityVote {
+        address owner;
+        uint quantity;      
+    }
+    
+    modifier didNotVoteOnBooleanPoll(address memberAddress, uint pollIndex) {
+        require(!alreadyVotedOnBooleanPoll(memberAddress, pollIndex));_;
+    }
+    
+    modifier didNotVoteOnQuantityPoll(address memberAddress, uint pollIndex) {
+        require(!alreadyVotedOnQuantityPoll(memberAddress, pollIndex));_;
+    }
+    
+    modifier didNotVoteOnOptionsPoll(address memberAddress, uint pollIndex) {
+        require(!alreadyVotedOnOptionsPoll(memberAddress, pollIndex));_;
+    }
+    
+    modifier isNotEmpty(string memory pollSubject) { 
+        require(!stringsAreEqual(pollSubject, "")); _; 
     }
     
     // Enums
-    uint8 constant CREATED_BY_ADMIN = 0;
-    uint8 constant CREATED_BY_MEMBER = 1;
+    uint16 constant MAX_MEMBERS = 1000;
+    uint16 constant PRICE = 10;
     
-    // Checks if the poll is not ended by votes count
-    modifier isNotEndedByVotes(uint pollIndex) { 
-        require(pollVotes[pollIndex].length < polls[pollIndex].endInVotesCount); 
-        _; 
+    address payable contractOwner;
+    
+    Member[] members; // guarda todos membros 
+    QuantityPoll[] quantityPolls;   // guarda todas enquetes de quantidade
+    OptionsPoll[] optionsPolls;     // guarda todas enquetes de opções
+    BooleanPoll[] booleanPolls;     // guarda todas enquetes de sim / nao
+    mapping (uint => QuantityVote[]) quantityPollsVotes;    // dá o índice da enquete e recebe um array de votos
+    mapping (uint => OptionVote[]) optionsPollsVotes;       // dá o índice da enquete e recebe um array de votos
+    mapping (uint => BooleanVote[]) booleanPollsVotes;      // dá o índice da enquete e recebe um array de votos
+
+    constructor(string memory yourFullName) public {
+        contractOwner = msg.sender;
+        members.push(
+            Member(
+                msg.sender, yourFullName, true, false
+            )
+        );
     }
     
-    // Checks if the member did not vote in this poll
-    modifier didNotVote(address memberAddress, uint pollIndex) {
-        require(!alreadyVoted(memberAddress, pollIndex));
-        _;
+    function startBooleanPoll (string memory pollSubject) public isNotEmpty(pollSubject) {
+        booleanPolls.push(
+            BooleanPoll(
+                booleanPolls.length, pollSubject
+            )
+        );
     }
     
-    // Checks if the poll subject is not empty
-    modifier isNotEmpty(string memory pollSubject) { 
-        require(!stringsAreEqual(pollSubject, "")); 
-        _; 
+    function startQuantityPoll (string memory pollSubject) public isNotEmpty(pollSubject) {
+        quantityPolls.push(
+            QuantityPoll(
+                quantityPolls.length, pollSubject
+            )
+        );
     }
     
-    uint adminsCount; // guarda a quantidade de admins
-    Member[] members; // guarda todos membros (incluindo admins)
-    Poll[] polls; // guarda todas polls criadas
-    mapping (uint => Vote[]) pollVotes; // guarda os votos de uma poll
-    
-    function startPoll (uint index, uint starterIndex, string memory pollSubject, uint durationInVotes, 
-    uint8 accessNeededToVote) public isNotEmpty(pollSubject) 
-    {
-        polls.push(Poll(index, starterIndex, pollSubject, accessNeededToVote, durationInVotes));
+    function startOptionsPoll (string memory pollSubject, string[] memory options) public isNotEmpty(pollSubject) {
+        optionsPolls.push(
+            OptionsPoll(
+                optionsPolls.length, pollSubject, options
+            )
+        );
     }
     
-    function voteOnPoll (uint pollIndex, string memory stringParameter, uint numberParameter) 
-    public isNotEndedByVotes(pollIndex) didNotVote(msg.sender, pollIndex) {
-        pollVotes[pollIndex].push(Vote(msg.sender, stringParameter, numberParameter));
+    function voteOnBooleanPool(uint pollIndex, bool boolean) public didNotVoteOnBooleanPoll(msg.sender, pollIndex) {
+        booleanPollsVotes[pollIndex].push(
+            BooleanVote(
+                msg.sender, boolean
+            )
+        );
     }
     
-    /// Entering the chainclub
-    function buyMembership () public {
+    function voteOnQuantityPool(uint pollIndex, uint quantity) public didNotVoteOnQuantityPoll(msg.sender, pollIndex) {
+        quantityPollsVotes[pollIndex].push(
+            QuantityVote(
+                msg.sender, quantity
+            )
+        );
+    }
+    
+    function voteOnOptionPool(uint pollIndex, uint option) public didNotVoteOnOptionsPoll(msg.sender, pollIndex) {
+        optionsPollsVotes[pollIndex].push(
+            OptionVote(
+                msg.sender, option
+            )
+        );
+    }
+    
+    function buyMembership(string memory buyerName) payable public {
         
+        // Dinheiro vai pro fundador
+        if (members.length < MAX_MEMBERS) {
+            contractOwner.transfer(PRICE);
+        }
+        
+        // Procura membro que esteja vendendo
+        else { 
+            for (uint i = 0; i < members.length; i++) {
+                if (members[i].isSellingMembership) {
+                    members[i] = Member(
+                        msg.sender, buyerName, true, false
+                    );
+                    
+                    // Dinheiro vai pro membro
+                    members[i].wallet.transfer(PRICE);
+                }
+            }
+        }
     }
     
     /// Leaving the chainclub
     function sellMembership () public {
+        for (uint i = 0; i < members.length; i++) {
+            if (members[i].wallet == msg.sender) {
+                members[i].isSellingMembership = true;
+            }
+        }
         
     }
     
     //////////////// SIMPLE GETTERS ////////////////
-
-    function getPoll (uint pollIndex) public view returns (Poll memory) {
-        return polls[pollIndex];
+    
+    function getBooleanPoll (uint pollIndex) public view returns (BooleanPoll memory) {
+        return booleanPolls[pollIndex];
     }
     
-    function getPollSubject(uint index)
-        public view returns (string memory) {
-        return polls[index].subject;
+    function getBooleanPollSubject (uint pollIndex) public view returns (string memory) {
+        return booleanPolls[pollIndex].subject;
     }
     
-    function getPollVotes (uint pollIndex) public view returns (Vote[] memory) {
-        return pollVotes[pollIndex];
-    }
-
-    function getNumberOfVotes (uint pollIndex) public view returns (uint) {
-        return pollVotes[pollIndex].length;
+    function getQuantityPoll (uint pollIndex) public view returns (QuantityPoll memory) {
+        return quantityPolls[pollIndex];
     }
     
-    function getPolls () public view returns (Poll[] memory) {
-        return polls;
+    function getQuantityPollSubject (uint pollIndex) public view returns (string memory) {
+        return quantityPolls[pollIndex].subject;
+    }
+    
+    function getOptionsPoll (uint pollIndex) public view returns (OptionsPoll memory) {
+        return optionsPolls[pollIndex];
+    }
+    
+    function getOptionsPollSubject (uint pollIndex) public view returns (string memory) {
+        return optionsPolls[pollIndex].subject;
+    }
+    
+    function getBooleanPollVotes (uint pollIndex) public view returns (BooleanVote[] memory) {
+        return booleanPollsVotes[pollIndex];
+    }
+    
+    function getBooleanPollVotesCount (uint pollIndex) public view returns (uint) {
+        return booleanPollsVotes[pollIndex].length;
+    }
+    
+    function getQuantityPollVotes (uint pollIndex) public view returns (QuantityVote[] memory) {
+        return quantityPollsVotes[pollIndex];
+    }
+    
+    function getQuantityPollVotesCount (uint pollIndex) public view returns (uint) {
+        return quantityPollsVotes[pollIndex].length;
+    }
+    
+    function getOptionsPollVotes (uint pollIndex) public view returns (OptionVote[] memory) {
+        return optionsPollsVotes[pollIndex];
+    }
+    
+    function getOptionsPollVotesCount (uint pollIndex) public view returns (uint) {
+        return optionsPollsVotes[pollIndex].length;
     }
     
     function getMember (uint memberIndex) public view returns (Member memory) {
@@ -139,36 +226,36 @@ contract Chainclub {
         return members;
     }
     
-    function getAdmins () public view returns (Member[] memory) {
-        Member[] memory admins = new Member[](adminsCount);
-        for (uint i = 0; i < members.length; i++) {
-            if (members[i].access == 1) {
-                admins[i] = members[i];
-            }
-        }
-        return admins;
-    }
-    
-    function getAdminsCount () public view returns (uint) {
-        return adminsCount;
-    }
-    
     //////////////// PRIVATE FUNCTIONS ////////////////
     
     function stringsAreEqual (string memory a, string memory b) private pure returns (bool) {
         return (keccak256(abi.encodePacked((a))) == keccak256(abi.encodePacked((b))) );
     }
     
-    function alreadyVoted (address memberAddress, uint pollIndex) private view returns (bool) {
-        for (uint i = 0; i < pollVotes[pollIndex].length; i++) {
-            if (memberAddress == pollVotes[pollIndex][i].ownerAddress) {
+    function alreadyVotedOnBooleanPoll (address memberAddress, uint pollIndex) private view returns (bool) {
+        for (uint i = 0; i < booleanPollsVotes[pollIndex].length; i++) {
+            if (memberAddress == booleanPollsVotes[pollIndex][i].owner) {
                 return true;
             }
         }
         return false;
     }
-    function getPollCount()
-        public view returns (uint) {
-        return polls.length;
+    
+    function alreadyVotedOnQuantityPoll (address memberAddress, uint pollIndex) private view returns (bool) {
+        for (uint i = 0; i < quantityPollsVotes[pollIndex].length; i++) {
+            if (memberAddress == quantityPollsVotes[pollIndex][i].owner) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    function alreadyVotedOnOptionsPoll (address memberAddress, uint pollIndex) private view returns (bool) {
+        for (uint i = 0; i < optionsPollsVotes[pollIndex].length; i++) {
+            if (memberAddress == optionsPollsVotes[pollIndex][i].owner) {
+                return true;
+            }
+        }
+        return false;
     }
 }
