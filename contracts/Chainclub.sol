@@ -101,10 +101,11 @@ contract Chainclub {
     }
     
     //////////////// SIMPLE GETTERS ////////////////
-    
+
     function getPoll (uint pollIndex) public view returns (Poll memory) {
         return polls[pollIndex];
     }
+    
     function getPollSubject(uint index)
         public view returns (string memory) {
         return polls[index].subject;
@@ -112,6 +113,10 @@ contract Chainclub {
     
     function getPollVotes (uint pollIndex) public view returns (Vote[] memory) {
         return pollVotes[pollIndex];
+    }
+
+    function getNumberOfVotes (uint pollIndex) public view returns (uint) {
+        return pollVotes[pollIndex].length;
     }
     
     function getPolls () public view returns (Poll[] memory) {

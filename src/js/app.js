@@ -1,12 +1,15 @@
 App = {
   web3Provider: null,
   contracts: {},
+  polls: [],
   account: "0x0",
+
   init: async function() {
     return await App.initWeb3();
   },
 
   initWeb3: function() {
+    console.log(web3)
     // TODO: refactor conditional
     if (typeof web3 !== "undefined") {
       // If a web3 instance is already provided by Meta Mask.
@@ -26,6 +29,8 @@ App = {
     $.getJSON("Chainclub.json", function(Chainclub) {
       App.contracts.Chainclub = TruffleContract(Chainclub);
       App.contracts.Chainclub.setProvider(App.web3Provider);
+
+      console.log(App.contracts)
       return App.render();
     });
   },
@@ -37,15 +42,37 @@ App = {
         $("#accountAddress").html("Your Account: " + account);
       }
     });
+
     //Projeto Inicia aqui
     App.contracts.Chainclub.deployed()
       .then(function(instance) {
         return instance;
       })
-      .then(function(chainclubInstance) {
-        var count = chainclubInstance.getPollCount();
-        console.log(count);
+      .then(function(chainclubInstance) {        
+        chainclubInstance.getPollCount().then(res => {
+          return res.c[0]
+        })
+        .then(async count => {
+          for(var i = 0; i < count; i++) {
+            const subject = await chainclubInstance.getPollSubject(i).then(res => {
+              return res
+            })
+
+            const votes = await chainclubInstance.getNumberOfVotes(i).then(res => {
+              return res.c[0]
+            })
+
+            poll = {
+              subject: subject,
+              votes: votes
+            }
+
+            App.polls.push(subject)
+          }
+        });
       });
+
+    console.log(App.polls)
   }
 };
 
