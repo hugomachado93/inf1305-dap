@@ -126,7 +126,7 @@ contract Chainclub {
     }
 
     function startBooleanPoll (string memory pollSubject) public
-    isNotEmpty(pollSubject) {
+    isMember(msg.sender) isNotEmpty(pollSubject) {
         booleanPolls.push(
             BooleanPoll(
                 booleanPolls.length, pollSubject
@@ -135,7 +135,7 @@ contract Chainclub {
     }
 
     function startQuantityPoll (string memory pollSubject, uint bottomLimit, uint topLimit) public
-    isNotEmpty(pollSubject) {
+    isMember(msg.sender) isNotEmpty(pollSubject) {
         quantityPolls.push(
             QuantityPoll(
                 quantityPolls.length, pollSubject, bottomLimit, topLimit
@@ -144,7 +144,7 @@ contract Chainclub {
     }
 
     function startOptionsPoll (string memory pollSubject, string[] memory options) public
-    isNotEmpty(pollSubject) {
+    isMember(msg.sender) isNotEmpty(pollSubject) {
         optionsPolls.push(
             OptionsPoll(
                 optionsPolls.length, pollSubject, options
