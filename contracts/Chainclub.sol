@@ -207,7 +207,8 @@ contract Chainclub {
         }
     }
 
-    function sellMembership () public {
+    function sellMembership () public
+    isMember(msg.sender) {
         for (uint i = 0; i < members.length; i++) {
             if (members[i].wallet == msg.sender) {
                 members[i].isSellingMembership = true;
@@ -215,7 +216,8 @@ contract Chainclub {
         }
     }
 
-    function enterInClub(address[3] memory newVisitors) public isMember(msg.sender) {
+    function enterInClub(address[3] memory newVisitors) public isMember(msg.sender)
+    isMember(msg.sender) {
         Member memory _msgSender = getMember(msg.sender);
         if (_msgSender.paidPendencies) {
             for (uint8 i = 0; i < newVisitors.length; i++) {
@@ -224,7 +226,8 @@ contract Chainclub {
         }
     }
 
-    function leaveTheClub() public {
+    function leaveTheClub() public
+    isMember(msg.sender) {
         for (uint i = 0; i < visitors.length; i++) {
             if (visitors[i].memberResponsible == msg.sender) {
                 delete visitors[i];
