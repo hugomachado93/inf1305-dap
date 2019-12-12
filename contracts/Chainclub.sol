@@ -26,7 +26,7 @@ contract Chainclub {
     struct OptionsPoll {
         uint pollIndex;
         string subject;     // Ex: No que vamos investir?
-        string[] options;   // "Piscina de ondas", "Pista de corrida", "Torre de bung jump"
+        string options;   // "Piscina de ondas", "Pista de corrida", "Torre de bung jump"
     }
 
     struct QuantityPoll {
@@ -52,28 +52,23 @@ contract Chainclub {
     }
 
     modifier didNotVoteOnBooleanPoll(address memberAddress, uint pollIndex) {
-        require(!alreadyVotedOnBooleanPoll(memberAddress, pollIndex),
-        "You already voted this poll."); _;
+ _;
     }
 
     modifier didNotVoteOnQuantityPoll(address memberAddress, uint pollIndex) {
-        require(!alreadyVotedOnQuantityPoll(memberAddress, pollIndex),
-        "You already voted this poll."); _;
+ _;
     }
 
     modifier didNotVoteOnOptionsPoll(address memberAddress, uint pollIndex) {
-        require(!alreadyVotedOnOptionsPoll(memberAddress, pollIndex),
-        "You already voted this poll."); _;
+ _;
     }
 
     modifier isNotEmpty(string memory pollSubject) {
-        require(!stringsAreEqual(pollSubject, ""),
-        "Poll subject is empty."); _;
+ _;
     }
 
     modifier moneyIsEnough(uint value) {
-        require(value >= MEMBERSHIP_PRICE_IN_WEI,
-        "You need 1000000000 wei to become a member."); _;
+ _;
     }
 
     modifier clubIsAcceptingMembers() {
@@ -83,24 +78,15 @@ contract Chainclub {
                 _someoneIsSelling = true;
             }
         }
-        require(_someoneIsSelling || members.length < MAX_MEMBERS,
-        "Sorry but we can't accept more members."); _;
+ _;
     }
 
     modifier isOnLimit(uint pollIndex, uint quantity) {
-        require (quantityPolls[pollIndex].bottomLimit <= quantity && quantityPolls[pollIndex].topLimit >= quantity,
-        "Value is out of bounds."); _;
+_;
     }
 
     modifier isMember(address addr) {
-        bool boolean = false;
-        for (uint i = 0; i < members.length; i++) {
-            if (members[i].wallet == msg.sender) {
-                boolean = true;
-            }
-        }
-        require(boolean,
-        "You are not a member."); _;
+ _;
     }
 
     address payable contractOwner;
@@ -143,7 +129,7 @@ contract Chainclub {
         );
     }
 
-    function startOptionsPoll (string memory pollSubject, string[] memory options) public
+    function startOptionsPoll (string memory pollSubject, string memory options) public
     isMember(msg.sender) isNotEmpty(pollSubject) {
         optionsPolls.push(
             OptionsPoll(
@@ -255,6 +241,10 @@ contract Chainclub {
 
     function getOptionsPoll (uint pollIndex) public view returns (OptionsPoll memory) {
         return optionsPolls[pollIndex];
+    }
+
+    function getOptionsPollReturnOptions (uint pollIndex) public view returns (string memory) {
+        return optionsPolls[pollIndex].options;
     }
 
     function getBooleanPollVotes (uint pollIndex) public view returns (BooleanVote[] memory) {

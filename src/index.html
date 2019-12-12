@@ -5,8 +5,9 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
-    <title>Store Crypt</title>
+    <title></title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="mystyle.css">
     <!-- Bootstrap -->
     <!--<link href="css/bootstrap.min.css" rel="stylesheet"> -->
 
@@ -25,7 +26,7 @@
         <div class="container" style="width: 650px;">
           <div class="row">
             <div class="col-lg-12">
-              <h1 class="text-center">Trade</h1>
+              <h1 class="text-center">Create Poll</h1>
               <hr/>
               <br/>
               <form onsubmit="App.booleanpoll(); return false">
@@ -35,6 +36,7 @@
                 </div>
                 <button type="submit" class="btn btn-primary">Submit</button>
               </form>
+              <hr>
               <form onsubmit="App.quantitypoll(); return false">
                   <div class="form-group">
                     <label for="Address">Quantity poll</label>
@@ -50,10 +52,27 @@
                   </div>
                   <button type="submit" class="btn btn-primary">Submit</button>
                 </form>
+                <hr>
+                <form onsubmit="App.optionspoll(); return false">
+                  <div class="form-group">
+                    <label for="Address">Options poll</label>
+                    <input type="text" class="form-control" id="options-poll" placeholder="Enter..">
+                  </div>
+                  <div class="form-group">
+                    <label for="Address">Options(separate by ';')</label>
+                    <input type="text" class="form-control" id="options" placeholder="Enter..">
+                  </div>
+                  <button type="submit" class="btn btn-primary">Submit</button>
+                </form>
+                <hr>  
               <p id="accountAddress"></p>
             </div>
           </div>
+
+          <h1 class="text-center">Voting area</h1>
+
           <ul id="polls-list"></ul>
+          <ul id="polls-result"></ul>
         </div>
 
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>

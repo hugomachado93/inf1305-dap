@@ -72,7 +72,7 @@ App = {
           .then(res => {
             return res.c[0]
           });
-
+          
           console.log(num_votes)
 
           count++;
@@ -149,12 +149,20 @@ App = {
             return res.c[0]
           });
 
+          const allOptions = await chainclubInstance.getOptionsPollReturnOptions(count)
+          .then(res => {
+            return res
+          });
+
+          console.log("aqui" + allOptions);
+
           count++;
 
           poll = {
             subject: subject,
             num_votes: num_votes,
-            type: 'options'
+            type: 'options',
+            options: allOptions
           }
 
           App.polls.push(poll)
@@ -164,23 +172,48 @@ App = {
 
         for(var i = 0; i < App.polls.length; i++) {
           if(App.polls[i].type == 'boolean') {
-            $("#polls-list").append(`<li>${App.polls[i].subject} (${App.polls[i].num_votes} votes) <button>Yes</button> <button>No</button></li>`)
+            $("#polls-list").append(`<li>${App.polls[i].subject} (${App.polls[i].num_votes} votes)  <form onsubmit="App.voteBoleanPollYes(${i}); return false"> <button type="submit" class="btn btn-primary">Yes</button></form>  <form onsubmit="App.voteBoleanPollNo(${i}); return false"> <button type="submit" class="btn btn-primary">No</button></form></li>`)
+            console.log("quantity " + App.polls[i].num_votes)
           }
 
           else if(App.polls[i].type == 'quantity') {
+            
+            var nVotes;
+            if(App.polls[i].num_votes != "undefined") {
+              console.log("aqui " + i)
+              nVotes = App.polls[i].num_votes;
+            } else {
+              nVotes = 0;
+            }
+
+            if(i == -1){
+              i = 0;
+            }
+
             $("#polls-list").append(`
-            <li>${App.polls[i].subject} (${App.polls[i].num_votes} votes)
-              <form action="#">
-                <p class="range-field">
-                  <input type="range" name="myVal" id="myVal" min="${App.polls[i].bottom_limit}" max="${App.polls[i].top_limit}" value="0" oninput="this.form.myValInput.value=this.value" />
-                  <input type="number" name="myValInput" min="${App.polls[i].bottom_limit}" max="${App.polls[i].top_limit}" value="0" oninput="this.form.myVal.value=this.value" />
-                  <button>Confirm</button>
-                </p>
+            <li>${App.polls[i].subject} (${nVotes} votes)
+              <form onsubmit="App.voteQuantityPoll(${i}, ${$("#myVal").val()}); return false">
+                <div class="range-field">
+                  <input type="range" name="myVal" id="myVal" min="${App.polls[i].bottom_limit}" max="${App.polls[i].top_limit}" value="${App.polls[i].bottom_limit}" oninput="this.form.myValInput.value=this.value" />
+                  <input type="number" name="myValInput" min="${App.polls[i].bottom_limit}" max="${App.polls[i].top_limit}" value="${App.polls[i].bottom_limit}" oninput="this.form.myVal.value=this.value" />
+                  <button type="submit" class="btn btn-primary">confirm</button>
+                </div>
               </form>
             </li>`)
+            console.log("quantity " + App.polls[i].num_votes);
+
+          }else if(App.polls[i].type == 'options') {
+            var optionsArray = App.polls[i].options.split(';')
+            $("#polls-list").append(`<li>${App.polls[i].subject} (${App.polls[i].num_votes} votes) </li>`)
+            for(var j=0;j<optionsArray.length;j++) {
+              $("#polls-list").append(`<li>${optionsArray[j]} <form onsubmit="App.voteOptionsPoll(${i}, ${j}); return false"> <button type="submit" id="option-vote" class="btn btn-primary">Vote</button></form></li>`)
+            }
           }
         }
+
       });
+
+
   },
 
   booleanpoll: function() {
@@ -200,6 +233,49 @@ App = {
 
     App.contracts.Chainclub.deployed().then(function(instance){
       instance.startQuantityPoll(booleanpoll,inferiorlimtit,superiorlimit, {from: App.account}).then(function(result){
+        console.log(result);
+      });
+    });
+  },
+
+  optionspoll: function() {
+    var optionsPoll = $("#options-poll").val();
+    var options = $("#options").val();
+    console.log(optionsPoll, options)
+    App.contracts.Chainclub.deployed().then(function(instance){
+      instance.startOptionsPoll(optionsPoll, options, {from: App.account}).then(function(result){
+        console.log(result);
+      });
+    });
+  },
+
+  voteBoleanPollYes: function(index) {
+    App.contracts.Chainclub.deployed().then(function(instance){
+      instance.voteOnBooleanPool(index,true, {from: App.account}).then(function(result){
+        console.log(result);
+      });
+    });
+  },
+
+  voteBoleanPollNo: function(index) {
+    App.contracts.Chainclub.deployed().then(function(instance){
+      instance.voteOnBooleanPool(index,false, {from: App.account}).then(function(result){
+        console.log(result);
+      });
+    });
+  },
+
+  voteQuantityPoll: function(index, quantity) {
+    App.contracts.Chainclub.deployed().then(function(instance){
+      instance.voteOnQuantityPool(index,quantity, {from: App.account}).then(function(result){
+        console.log(result);
+      });
+    });
+  },
+
+  voteOptionsPoll: function(index, option) {
+    App.contracts.Chainclub.deployed().then(function(instance){
+      instance.voteOnOptionPool(index,option, {from: App.account}).then(function(result){
         console.log(result);
       });
     });
